@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Geração de Recibos - Vale Transporte e Alimentação</title>
+    <link rel="stylesheet" href="recibos.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>
+                    <i class="icon-receipt">🧾</i>
+                    Sistema de Recibos
+                </h1>
+                <div class="header-actions">
+                    <button class="btn-icon" id="themeToggle" title="Alternar tema">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                    <button class="btn-icon" id="configBtn" title="Configurações">
+                        <span>⚙️</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+            <button class="nav-btn active" data-tab="generator">
+                <i>📝</i>
+                <span>Gerar Recibo</span>
+            </button>
+            <button class="nav-btn" data-tab="calendar">
+                <i>📅</i>
+                <span>Calendário</span>
+            </button>
+            <button class="nav-btn" data-tab="history">
+                <i>📋</i>
+                <span>Histórico</span>
+            </button>
+            <button class="nav-btn" data-tab="templates">
+                <i>🎨</i>
+                <span>Templates</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Generator Tab -->
+            <div class="tab-content active" id="generator">
+                <div class="form-section">
+                    <h2>Dados do Funcionário</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="funcionarioNome">
+                                Nome Completo *
+                                <span class="tooltip" data-tooltip="Digite o nome completo do funcionário">ℹ️</span>
+                            </label>
+                            <input type="text" id="funcionarioNome" class="form-input" required>
+                            <div class="error-message" id="error-funcionarioNome"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="funcionarioCpf">
+                                CPF *
+                                <span class="tooltip" data-tooltip="Digite apenas os números do CPF">ℹ️</span>
+                            </label>
+                            <input type="text" id="funcionarioCpf" class="form-input cpf-mask" required maxlength="14">
+                            <div class="error-message" id="error-funcionarioCpf"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="funcionarioMatricula">
+                                Matrícula
+                                <span class="tooltip" data-tooltip="Número de matrícula do funcionário">ℹ️</span>
+                            </label>
+                            <input type="text" id="funcionarioMatricula" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="funcionarioCargo">
+                                Cargo
+                                <span class="tooltip" data-tooltip="Cargo do funcionário na empresa">ℹ️</span>
+                            </label>
+                            <input type="text" id="funcionarioCargo" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Dados da Empresa</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="empresaNome">
+                                Nome da Empresa *
+                                <span class="tooltip" data-tooltip="Razão social ou nome fantasia">ℹ️</span>
+                            </label>
+                            <input type="text" id="empresaNome" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="empresaCnpj">
+                                CNPJ
+                                <span class="tooltip" data-tooltip="CNPJ da empresa (opcional)">ℹ️</span>
+                            </label>
+                            <input type="text" id="empresaCnpj" class="form-input cnpj-mask" maxlength="18">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Valores dos Benefícios</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="valeTransporte">
+                                Vale Transporte
+                                <span class="tooltip" data-tooltip="Valor do vale transporte em reais">ℹ️</span>
+                            </label>
+                            <input type="text" id="valeTransporte" class="form-input money-mask" placeholder="R$ 0,00">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="valeAlimentacao">
+                                Vale Alimentação
+                                <span class="tooltip" data-tooltip="Valor do vale alimentação em reais">ℹ️</span>
+                            </label>
+                            <input type="text" id="valeAlimentacao" class="form-input money-mask" placeholder="R$ 0,00">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dataRecibo">
+                                Data do Recibo *
+                                <span class="tooltip" data-tooltip="Data de emissão do recibo">ℹ️</span>
+                            </label>
+                            <input type="date" id="dataRecibo" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="periodoReferencia">
+                                Período de Referência
+                                <span class="tooltip" data-tooltip="Mês/ano de referência do benefício">ℹ️</span>
+                            </label>
+                            <input type="month" id="periodoReferencia" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="previewBtn">
+                        <i>👁️</i>
+                        Visualizar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="generateBtn">
+                        <i>📄</i>
+                        Gerar PDF
+                    </button>
+                    <button type="button" class="btn btn-success" id="saveConfigBtn">
+                        <i>💾</i>
+                        Salvar Config
+                    </button>
+                </div>
+            </div>
+
+            <!-- Calendar Tab -->
+            <div class="tab-content" id="calendar">
+                <div class="calendar-section">
+                    <div class="calendar-header">
+                        <button class="btn-icon" id="prevMonth">‹</button>
+                        <h2 id="currentMonth">Janeiro 2024</h2>
+                        <button class="btn-icon" id="nextMonth">›</button>
+                    </div>
+                    
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <span class="legend-color legend-workday"></span>
+                            <span>Dia Útil</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color legend-weekend"></span>
+                            <span>Final de Semana</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color legend-holiday"></span>
+                            <span>Feriado</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color legend-selected"></span>
+                            <span>Selecionado</span>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Calendar days will be generated here -->
+                    </div>
+                    
+                    <div class="calendar-actions">
+                        <button class="btn btn-secondary" id="clearSelection">Limpar Seleção</button>
+                        <button class="btn btn-primary" id="applyDays">Aplicar Dias Selecionados</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-content" id="history">
+                <div class="history-section">
+                    <div class="history-header">
+                        <h2>Histórico de Recibos</h2>
+                        <div class="history-actions">
+                            <button class="btn btn-secondary" id="exportHistory">
+                                <i>📤</i>
+                                Exportar
+                            </button>
+                            <button class="btn btn-danger" id="clearHistory">
+                                <i>🗑️</i>
+                                Limpar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="history-filters">
+                        <input type="search" placeholder="Buscar por nome ou CPF..." class="search-input" id="historySearch">
+                        <select class="form-input" id="historyFilter">
+                            <option value="">Todos os tipos</option>
+                            <option value="transporte">Vale Transporte</option>
+                            <option value="alimentacao">Vale Alimentação</option>
+                            <option value="ambos">Ambos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="history-list" id="historyList">
+                        <!-- History items will be generated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Templates Tab -->
+            <div class="tab-content" id="templates">
+                <div class="templates-section">
+                    <h2>Templates Personalizados</h2>
+                    <div class="templates-grid">
+                        <div class="template-card active" data-template="default">
+                            <div class="template-preview">
+                                <div class="template-sample">Template Padrão</div>
+                            </div>
+                            <h3>Padrão</h3>
+                            <p>Template básico com layout simples</p>
+                        </div>
+                        
+                        <div class="template-card" data-template="professional">
+                            <div class="template-preview">
+                                <div class="template-sample">Template Profissional</div>
+                            </div>
+                            <h3>Profissional</h3>
+                            <p>Template com design mais elaborado</p>
+                        </div>
+                        
+                        <div class="template-card" data-template="modern">
+                            <div class="template-preview">
+                                <div class="template-sample">Template Moderno</div>
+                            </div>
+                            <h3>Moderno</h3>
+                            <p>Template com design contemporâneo</p>
+                        </div>
+                    </div>
+                    
+                    <div class="template-customization">
+                        <h3>Personalização</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="logoUpload">Logo da Empresa</label>
+                                <input type="file" id="logoUpload" accept="image/*" class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="headerColor">Cor do Cabeçalho</label>
+                                <input type="color" id="headerColor" class="form-input" value="#1a237e">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="fontSize">Tamanho da Fonte</label>
+                                <select id="fontSize" class="form-input">
+                                    <option value="small">Pequena</option>
+                                    <option value="medium" selected>Média</option>
+                                    <option value="large">Grande</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- PDF Preview Modal -->
+        <div class="modal" id="previewModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Visualização do Recibo</h3>
+                    <button class="btn-close" id="closePreview">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="pdf-preview" id="pdfPreview">
+                        <!-- PDF preview will be rendered here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelPreview">Cancelar</button>
+                    <button class="btn btn-primary" id="confirmGenerate">Gerar PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Gerando PDF...</p>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="notifications" id="notifications"></div>
+    </div>
+
+    <script src="recibos.js"></script>
+</body>
+</html>
