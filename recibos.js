@@ -32,7 +32,13 @@ class ReceitosSystem {
         
         // Navigation
         document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabName = btn.dataset.tab;
+                if (tabName) {
+                    this.switchTab(tabName);
+                }
+            });
         });
         
         // Form actions
@@ -266,9 +272,9 @@ class ReceitosSystem {
         
         // Tab-specific actions
         if (tabName === 'calendar') {
-            this.renderCalendar();
+            setTimeout(() => this.renderCalendar(), 100);
         } else if (tabName === 'history') {
-            this.renderHistory();
+            setTimeout(() => this.renderHistory(), 100);
         }
     }
 
@@ -297,14 +303,6 @@ class ReceitosSystem {
             const dayHeader = document.createElement('div');
             dayHeader.className = 'calendar-day-header';
             dayHeader.textContent = day;
-            dayHeader.style.cssText = `
-                padding: 0.5rem;
-                font-weight: 600;
-                text-align: center;
-                background: var(--bg-tertiary);
-                color: var(--text-secondary);
-                font-size: var(--font-size-sm);
-            `;
             calendarGrid.appendChild(dayHeader);
         });
         
@@ -441,57 +439,15 @@ class ReceitosSystem {
         
         try {
             const formData = this.getFormData();
-            const receiptHTML = this.generateReceiptHTML(formData);
             
-            // Create temporary element for PDF generation
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = receiptHTML;
-            tempDiv.style.cssText = `
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-                width: 794px;
-                background: white;
-                padding: 40px;
-            `;
-            document.body.appendChild(tempDiv);
-            
-            // Generate PDF using html2canvas and jsPDF
-            const canvas = await html2canvas(tempDiv, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true
-            });
-            
-            document.body.removeChild(tempDiv);
-            
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            
-            const imgData = canvas.toDataURL('image/png');
-            const imgWidth = 210;
-            const pageHeight = 295;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let heightLeft = imgHeight;
-            let position = 0;
-            
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-            
-            while (heightLeft >= 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-            
-            const fileName = `recibo_${formData.funcionarioNome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-            pdf.save(fileName);
+            // Use the simple PDF generator
+            const pdfGenerator = new SimplePDFGenerator();
+            await pdfGenerator.generatePDF(formData);
             
             // Save to history
             this.saveToHistory(formData);
             
-            this.showNotification('PDF gerado com sucesso!', 'success');
+            this.showNotification('PDF gerado com sucesso! Verifique a janela de impressão.', 'success');
             
         } catch (error) {
             console.error('Erro ao gerar PDF:', error);
