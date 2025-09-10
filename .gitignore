@@ -1,0 +1,26 @@
+# OS System - Arquivos que não devem ser commitados
+node_modules/
+dist/
+*.log
+.env
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.directory
+desktop.ini
+
+# Backup files
+*.bak
+*~

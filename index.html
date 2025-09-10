@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Emissão de Ordens de Serviço</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- FontAwesome Icons - fallback to Unicode if CDN fails -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
+          onerror="console.log('FontAwesome CDN failed, using Unicode fallbacks')">
+    <!-- jsPDF Library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" 
+            onerror="console.error('jsPDF CDN failed - PDF generation will not work')"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-clipboard-list"></i> Sistema de Emissão de Ordens de Serviço</h1>
+                <p>Sistema offline para geração de OS de manutenção</p>
+            </div>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="form">
+                <i class="fas fa-edit"></i> Nova OS
+            </button>
+            <button class="tab-btn" data-tab="companies">
+                <i class="fas fa-building"></i> Empresas
+            </button>
+            <button class="tab-btn" data-tab="preview">
+                <i class="fas fa-eye"></i> Preview
+            </button>
+            <button class="tab-btn" data-tab="backup">
+                <i class="fas fa-download"></i> Backup
+            </button>
+        </nav>
+
+        <main class="main-content">
+            <!-- Formulário de OS -->
+            <div id="form-tab" class="tab-content active">
+                <div class="form-container">
+                    <h2><i class="fas fa-file-alt"></i> Nova Ordem de Serviço</h2>
+                    
+                    <form id="os-form">
+                        <!-- Informações Básicas -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-info-circle"></i> Informações Básicas</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="data-hora">Data e Hora</label>
+                                    <input type="datetime-local" id="data-hora" name="dataHora" required readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tipo-manutencao">Tipo de Manutenção</label>
+                                    <select id="tipo-manutencao" name="tipoManutencao" required>
+                                        <option value="">Selecione o tipo</option>
+                                        <option value="diaria">Manutenção Diária</option>
+                                        <option value="semanal">Manutenção Semanal</option>
+                                        <option value="mensal">Manutenção Mensal</option>
+                                        <option value="trimestral">Manutenção Trimestral</option>
+                                        <option value="anual">Manutenção Anual</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="data-solicitacao">Data de Solicitação</label>
+                                <input type="date" id="data-solicitacao" name="dataSolicitacao" required>
+                            </div>
+                        </div>
+
+                        <!-- Dados da Contratante -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-handshake"></i> Dados da Contratante</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group flex-grow">
+                                    <label for="contratante-select">Empresa Pré-cadastrada</label>
+                                    <select id="contratante-select" name="contratanteSelect">
+                                        <option value="">Selecionar empresa ou preencher manualmente</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" class="btn-secondary" id="new-contratante">
+                                        <i class="fas fa-plus"></i> Nova
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contratante-nome">Nome da Empresa</label>
+                                    <input type="text" id="contratante-nome" name="contratanteNome" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contratante-cnpj">CNPJ</label>
+                                    <input type="text" id="contratante-cnpj" name="contratanteCnpj" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contratante-endereco">Endereço</label>
+                                    <input type="text" id="contratante-endereco" name="contratanteEndereco" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contratante-telefone">Telefone</label>
+                                    <input type="tel" id="contratante-telefone" name="contratanteTelefone" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dados da Contratada -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-tools"></i> Dados da Contratada</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group flex-grow">
+                                    <label for="contratada-select">Empresa Pré-cadastrada</label>
+                                    <select id="contratada-select" name="contratadaSelect">
+                                        <option value="">Selecionar empresa ou preencher manualmente</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" class="btn-secondary" id="new-contratada">
+                                        <i class="fas fa-plus"></i> Nova
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contratada-nome">Nome da Empresa</label>
+                                    <input type="text" id="contratada-nome" name="contratadaNome" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contratada-cnpj">CNPJ</label>
+                                    <input type="text" id="contratada-cnpj" name="contratadaCnpj" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contratada-endereco">Endereço</label>
+                                    <input type="text" id="contratada-endereco" name="contratadaEndereco" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contratada-telefone">Telefone</label>
+                                    <input type="tel" id="contratada-telefone" name="contratadaTelefone" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Técnico Responsável -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-user-tie"></i> Técnico Responsável</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="tecnico-nome">Nome do Técnico</label>
+                                    <input type="text" id="tecnico-nome" name="tecnicoNome" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tecnico-cpf">CPF do Técnico</label>
+                                    <input type="text" id="tecnico-cpf" name="tecnicoCpf" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descrição da Solicitação -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-clipboard"></i> Descrição da Solicitação</h3>
+                            
+                            <div class="form-group">
+                                <label for="descricao">Descrição detalhada da manutenção</label>
+                                <textarea id="descricao" name="descricao" rows="6" required 
+                                    placeholder="Descreva detalhadamente o serviço a ser realizado, equipamentos envolvidos, procedimentos necessários, etc."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" id="clear-form">
+                                <i class="fas fa-times"></i> Limpar
+                            </button>
+                            <button type="button" class="btn-primary" id="preview-btn">
+                                <i class="fas fa-eye"></i> Visualizar
+                            </button>
+                            <button type="button" class="btn-success" id="generate-pdf">
+                                <i class="fas fa-file-pdf"></i> Gerar PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Gerenciamento de Empresas -->
+            <div id="companies-tab" class="tab-content">
+                <div class="companies-container">
+                    <h2><i class="fas fa-building"></i> Gerenciamento de Empresas</h2>
+                    
+                    <div class="companies-sections">
+                        <div class="company-section">
+                            <h3><i class="fas fa-handshake"></i> Empresas Contratantes</h3>
+                            <button class="btn-primary" id="add-contratante">
+                                <i class="fas fa-plus"></i> Adicionar Contratante
+                            </button>
+                            <div id="contratantes-list" class="companies-list"></div>
+                        </div>
+
+                        <div class="company-section">
+                            <h3><i class="fas fa-tools"></i> Empresas Contratadas</h3>
+                            <button class="btn-primary" id="add-contratada">
+                                <i class="fas fa-plus"></i> Adicionar Contratada
+                            </button>
+                            <div id="contratadas-list" class="companies-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview da OS -->
+            <div id="preview-tab" class="tab-content">
+                <div class="preview-container">
+                    <h2><i class="fas fa-eye"></i> Preview da Ordem de Serviço</h2>
+                    <div id="preview-content" class="preview-content">
+                        <p class="no-preview">Preencha o formulário e clique em "Visualizar" para ver o preview da OS.</p>
+                    </div>
+                    <div class="preview-actions">
+                        <button class="btn-primary" id="generate-pdf-preview">
+                            <i class="fas fa-file-pdf"></i> Gerar PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup -->
+            <div id="backup-tab" class="tab-content">
+                <div class="backup-container">
+                    <h2><i class="fas fa-download"></i> Backup e Restauração</h2>
+                    
+                    <div class="backup-section">
+                        <h3><i class="fas fa-save"></i> Backup dos Dados</h3>
+                        <p>Faça backup de todas as empresas cadastradas e configurações do sistema.</p>
+                        <button class="btn-primary" id="export-backup">
+                            <i class="fas fa-download"></i> Exportar Backup
+                        </button>
+                    </div>
+
+                    <div class="backup-section">
+                        <h3><i class="fas fa-upload"></i> Restaurar Dados</h3>
+                        <p>Restaure dados de um backup anterior.</p>
+                        <input type="file" id="import-backup" accept=".json" style="display: none;">
+                        <button class="btn-secondary" id="import-backup-btn">
+                            <i class="fas fa-upload"></i> Importar Backup
+                        </button>
+                    </div>
+
+                    <div class="backup-section">
+                        <h3><i class="fas fa-trash-alt"></i> Limpar Dados</h3>
+                        <p>Remove todos os dados salvos localmente. Esta ação não pode ser desfeita.</p>
+                        <button class="btn-danger" id="clear-all-data">
+                            <i class="fas fa-trash-alt"></i> Limpar Todos os Dados
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para adicionar empresas -->
+    <div id="company-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Adicionar Empresa</h3>
+                <button class="modal-close" id="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="company-form">
+                    <div class="form-group">
+                        <label for="company-nome">Nome da Empresa</label>
+                        <input type="text" id="company-nome" name="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company-cnpj">CNPJ</label>
+                        <input type="text" id="company-cnpj" name="cnpj" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company-endereco">Endereço</label>
+                        <input type="text" id="company-endereco" name="endereco" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company-telefone">Telefone</label>
+                        <input type="tel" id="company-telefone" name="telefone" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancel-company">Cancelar</button>
+                <button type="button" class="btn-primary" id="save-company">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/pdf-generator.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

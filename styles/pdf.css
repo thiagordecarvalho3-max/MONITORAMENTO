@@ -1,0 +1,269 @@
+/* PDF Specific Styles */
+.pdf-container {
+    font-family: 'Times New Roman', serif;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 20mm;
+    background: white;
+    color: black;
+    line-height: 1.6;
+    font-size: 12pt;
+}
+
+.pdf-header {
+    text-align: center;
+    border-bottom: 3px solid #2a5298;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.pdf-title {
+    font-size: 24pt;
+    font-weight: bold;
+    color: #2a5298;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.pdf-subtitle {
+    font-size: 14pt;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.pdf-number {
+    font-size: 16pt;
+    font-weight: bold;
+    color: #2a5298;
+    margin-top: 10px;
+}
+
+.pdf-section {
+    margin-bottom: 25px;
+    page-break-inside: avoid;
+}
+
+.pdf-section-title {
+    background: #2a5298;
+    color: white;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 14pt;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pdf-field-group {
+    display: table;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.pdf-field {
+    display: table-row;
+}
+
+.pdf-field-label {
+    display: table-cell;
+    font-weight: bold;
+    width: 180px;
+    padding: 3px 10px 3px 0;
+    vertical-align: top;
+    color: #333;
+}
+
+.pdf-field-value {
+    display: table-cell;
+    padding: 3px 0;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+    color: #000;
+}
+
+.pdf-field-full {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.pdf-field-full .pdf-field-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.pdf-field-full .pdf-field-value {
+    display: block;
+    border: 1px solid #ddd;
+    padding: 10px;
+    min-height: 100px;
+    background: #fafafa;
+}
+
+.pdf-grid {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pdf-grid-row {
+    display: table-row;
+}
+
+.pdf-grid-cell {
+    display: table-cell;
+    padding: 10px;
+    border: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.pdf-grid-header {
+    background: #f0f0f0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.pdf-signature-section {
+    margin-top: 40px;
+    page-break-inside: avoid;
+}
+
+.pdf-signatures {
+    display: table;
+    width: 100%;
+    margin-top: 30px;
+}
+
+.pdf-signature {
+    display: table-cell;
+    width: 50%;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.pdf-signature-line {
+    border-top: 2px solid #333;
+    margin-top: 60px;
+    padding-top: 5px;
+    font-weight: bold;
+}
+
+.pdf-signature-title {
+    font-size: 11pt;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.pdf-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 10pt;
+    color: #666;
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+}
+
+.pdf-page-break {
+    page-break-before: always;
+}
+
+/* Maintenance Type Specific Styles */
+.maintenance-diaria { color: #28a745; }
+.maintenance-semanal { color: #17a2b8; }
+.maintenance-mensal { color: #ffc107; }
+.maintenance-trimestral { color: #fd7e14; }
+.maintenance-anual { color: #dc3545; }
+
+.maintenance-badge {
+    background: #f8f9fa;
+    border: 2px solid currentColor;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+/* Print specific styles */
+@media print {
+    .pdf-container {
+        max-width: none;
+        margin: 0;
+        padding: 15mm;
+    }
+    
+    .pdf-title {
+        font-size: 20pt;
+    }
+    
+    .pdf-section-title {
+        font-size: 12pt;
+    }
+    
+    .pdf-field-label {
+        font-size: 11pt;
+    }
+    
+    .pdf-field-value {
+        font-size: 11pt;
+    }
+    
+    .pdf-footer {
+        font-size: 9pt;
+    }
+}
+
+/* Responsive adjustments for PDF preview */
+@media (max-width: 768px) {
+    .pdf-container {
+        padding: 10px;
+        font-size: 10pt;
+    }
+    
+    .pdf-title {
+        font-size: 18pt;
+    }
+    
+    .pdf-section-title {
+        font-size: 12pt;
+        padding: 6px 8px;
+    }
+    
+    .pdf-field-group {
+        display: block;
+    }
+    
+    .pdf-field {
+        display: block;
+        margin-bottom: 10px;
+    }
+    
+    .pdf-field-label {
+        display: block;
+        width: auto;
+        padding: 0 0 3px 0;
+    }
+    
+    .pdf-field-value {
+        display: block;
+        padding: 5px;
+        border: 1px solid #ddd;
+        background: #fafafa;
+    }
+    
+    .pdf-signatures {
+        display: block;
+    }
+    
+    .pdf-signature {
+        display: block;
+        width: 100%;
+        margin-bottom: 30px;
+        padding: 0;
+    }
+}
